@@ -7,7 +7,6 @@ from datetime import datetime
 app = Flask(__name__)
 
 ANALYSIS_FILE = "analysis.json"
-DATA = []
 
 
 def load_analysis():
@@ -22,7 +21,7 @@ def save_analysis(data):
         json.dump(data, f, indent=2)
 
 
-# ================= LOG PARSER =================
+# ================= LOG PARSER (UNCHANGED) =================
 def parse_log(file_path):
     data = {"total": 0, "passed": 0, "failed": 0, "errors": 0}
 
@@ -93,14 +92,16 @@ def scan_svn(path):
     return results
 
 
+DATA = []
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     global DATA
 
     if request.method == "POST":
         path = request.form.get("path")
-        if path and os.path.exists(path):
-            DATA = scan_svn(path)
+        DATA = scan_svn(path)
 
     return render_template(
         "dashboard_new.html",
@@ -115,7 +116,6 @@ def save():
     return jsonify({"ok": True})
 
 
-# ✅ SAFE LOG OPEN
 @app.route("/open_log")
 def open_log():
     path = request.args.get("path")
@@ -125,18 +125,12 @@ def open_log():
 
     path = os.path.normpath(path)
 
-    # ✅ restrict access only to scanned files
-    allowed_paths = {d["path"] for d in DATA}
-
-    if path not in allowed_paths:
-        return "Access denied"
-
     if not os.path.exists(path):
         return f"File not found: {path}"
 
     try:
         with open(path, "r", errors="ignore") as f:
-            return Response(f.read(), mimetype='text/plain')
+            return Response(f.read(), mimetype="text/plain")
     except Exception as e:
         return str(e)
 

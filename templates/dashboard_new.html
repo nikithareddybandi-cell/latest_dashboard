@@ -2,47 +2,198 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SVN Dashboard Tool</title>
+<title>SVN Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { margin:0; font-family:"Segoe UI"; background:#0b1220; color:#e5e7eb; }
-.container { display:flex; }
-.sidebar { width:240px; background:#111827; padding:15px; height:100vh; }
-.main { flex:1; padding:20px; }
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #0b1220;
+    color: #e5e7eb;
+}
 
-.folder { padding:10px; margin:6px 0; border-radius:8px; cursor:pointer; background:#1f2937; }
-.folder:hover { background:#2563eb; }
-.active-folder { background:#2563eb; }
+.container {
+    display: flex;
+}
 
-.topbar { display:flex; gap:10px; margin-bottom:15px; }
-input { padding:10px; border-radius:8px; border:none; background:#1f2937; color:white; }
-button { padding:10px; border:none; border-radius:8px; background:#22c55e; color:white; }
+.sidebar {
+    width: 240px;
+    background: #111827;
+    padding: 15px;
+    height: 100vh;
+    border-right: 1px solid #1f2937;
+    overflow-y: auto;
+}
 
-.cards { display:grid; grid-template-columns: repeat(5,1fr); gap:15px; }
-.card { padding:15px; border-radius:12px; text-align:center; cursor:pointer; background:#111827; }
-.active-card { outline:2px solid #2563eb; }
+.sidebar h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
 
-.PASS { border-left:5px solid #22c55e; }
-.FAIL { border-left:5px solid #fb923c; }
-.ERROR { border-left:5px solid #38bdf8; }
-.HALTED { border-left:5px solid #9ca3af; }
+.folder {
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #1f2937;
+    transition: 0.2s;
+}
 
-table { width:100%; border-collapse:collapse; margin-top:20px; }
-th,td { padding:10px; border-bottom:1px solid #1f2937; }
+.folder:hover {
+    background: #2563eb;
+}
 
-.badge { padding:4px 8px; border-radius:6px; }
-.badge.PASS { background:#14532d; color:#22c55e; }
-.badge.FAIL { background:#7c2d12; color:#fb923c; }
-.badge.ERROR { background:#0c4a6e; color:#38bdf8; }
-.badge.HALTED { background:#374151; color:#9ca3af; }
+.active-folder {
+    background: #2563eb;
+}
 
-.analysis { width:100%; background:#1f2937; color:white; border:none; padding:5px; }
+.main {
+    flex: 1;
+    padding: 20px;
+}
 
-tr.PASS { background:rgba(34,197,94,0.05); }
-tr.FAIL { background:rgba(251,146,60,0.05); }
-tr.ERROR { background:rgba(56,189,248,0.05); }
-tr.HALTED { background:rgba(156,163,175,0.05); }
+.topbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
 
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #1f2937;
+    color: white;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #22c55e;
+    color: white;
+    cursor: pointer;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.card {
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    background: #111827;
+    transition: 0.2s;
+    border: 1px solid #1f2937;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.card p {
+    font-size: 24px;
+    margin: 5px 0 0;
+    font-weight: 700;
+}
+
+.active-card {
+    outline: 2px solid #2563eb;
+}
+
+.card.total { border-left: 5px solid #60a5fa; }
+.card.pass { border-left: 5px solid #22c55e; }
+.card.fail { border-left: 5px solid #fb923c; }
+.card.error { border-left: 5px solid #38bdf8; }
+.card.halted { border-left: 5px solid #9ca3af; }
+
+.charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.chart-box {
+    background: #111827;
+    padding: 12px;
+    border-radius: 10px;
+    height: 300px;
+}
+
+.chart-box canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0f172a;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th {
+    background: #111827;
+    color: #9ca3af;
+    padding: 12px;
+    font-size: 14px;
+    text-align: center;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #1f2937;
+    text-align: center;
+}
+
+tr:hover {
+    background: #1e293b;
+    cursor: pointer;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.badge.PASS { background: #14532d; color: #22c55e; }
+.badge.FAIL { background: #7c2d12; color: #fb923c; }
+.badge.ERROR { background: #0c4a6e; color: #38bdf8; }
+.badge.HALTED { background: #374151; color: #9ca3af; }
+
+.analysis {
+    width: 100%;
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
+    background: #1f2937;
+    color: white;
+}
+
+@media (max-width: 1000px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 </head>
 
@@ -50,139 +201,211 @@ tr.HALTED { background:rgba(156,163,175,0.05); }
 
 <div class="container">
 
-<div class="sidebar">
-<h3>Modules</h3>
-<div class="folder active-folder" onclick="setFolder('ALL', this)">ALL</div>
-<div id="folderList"></div>
-</div>
+    <div class="sidebar">
+        <h2>📁 Modules</h2>
+        <div class="folder active-folder" onclick="setFolder('ALL', this)">ALL</div>
+        <div id="folderList"></div>
+    </div>
 
-<div class="main">
+    <div class="main">
 
-<form method="POST" class="topbar">
-<input name="path" placeholder="Enter SVN Path" style="flex:1;">
-<button>Scan</button>
-<input id="searchBox" placeholder="Search..." oninput="render()">
-</form>
+        <form method="POST" class="topbar">
+            <input name="path" placeholder="Enter SVN Path" style="flex:1;">
+            <button type="submit">Scan</button>
+            <input id="searchBox" placeholder="🔍 Search..." oninput="render()">
+        </form>
 
-<div class="cards">
-<div class="card active-card" onclick="setStatus('ALL', this)">TOTAL <p id="totalCount"></p></div>
-<div class="card PASS" onclick="setStatus('PASS', this)">PASS <p id="passCount"></p></div>
-<div class="card FAIL" onclick="setStatus('FAIL', this)">FAIL <p id="failCount"></p></div>
-<div class="card ERROR" onclick="setStatus('ERROR', this)">ERROR <p id="errorCount"></p></div>
-<div class="card HALTED" onclick="setStatus('HALTED', this)">HALTED <p id="haltedCount"></p></div>
-</div>
+        <div class="cards">
+            <div class="card total active-card" onclick="setStatus('ALL', this)">
+                <h3>TOTAL</h3>
+                <p id="totalCount">{{ data|length }}</p>
+            </div>
 
-<table>
-<thead>
-<tr>
-<th>File</th>
-<th>Module</th>
-<th>Date</th>
-<th>Total</th>
-<th>Pass</th>
-<th>Fail</th>
-<th>Error</th>
-<th>Status</th>
-<th>Analysis</th>
-</tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
+            <div class="card pass" onclick="setStatus('PASS', this)">
+                <h3>PASS</h3>
+                <p id="passCount">{{ data | selectattr('status', 'equalto', 'PASS') | list | length }}</p>
+            </div>
 
-</div>
+            <div class="card fail" onclick="setStatus('FAIL', this)">
+                <h3>FAIL</h3>
+                <p id="failCount">{{ data | selectattr('status', 'equalto', 'FAIL') | list | length }}</p>
+            </div>
+
+            <div class="card error" onclick="setStatus('ERROR', this)">
+                <h3>ERROR</h3>
+                <p id="errorCount">{{ data | selectattr('status', 'equalto', 'ERROR') | list | length }}</p>
+            </div>
+
+            <div class="card halted" onclick="setStatus('HALTED', this)">
+                <h3>HALTED</h3>
+                <p id="haltedCount">{{ data | selectattr('status', 'equalto', 'HALTED') | list | length }}</p>
+            </div>
+        </div>
+
+        <div id="graphSection" class="charts">
+            <div class="chart-box">
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="moduleChart"></canvas>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Module</th>
+                    <th>Status</th>
+                    <th>Analysis</th>
+                </tr>
+            </thead>
+            <tbody id="table"></tbody>
+        </table>
+
+    </div>
 </div>
 
 <script>
-
 let DATA = {{ data | tojson }};
 let ANALYSIS = {{ analysis | tojson }};
 
-let CURRENT_FOLDER="ALL";
-let CURRENT_STATUS="ALL";
+let CURRENT_FOLDER = "ALL";
+let CURRENT_STATUS = "ALL";
 
-function initFolders(){
-    let folders=[...new Set(DATA.map(d=>d.module))];
-    let html="";
-    folders.forEach(f=>{
-        html+=`<div class="folder" onclick="setFolder('${f}',this)">${f}</div>`;
+let statusChart = null;
+let moduleChart = null;
+
+function initFolders() {
+    let folders = [...new Set(DATA.map(d => d.module))];
+    folders.sort((a, b) => a.localeCompare(b));
+
+    let html = "";
+    folders.forEach(f => {
+        html += `<div class="folder" onclick="setFolder('${f}', this)">${f}</div>`;
     });
-    document.getElementById("folderList").innerHTML=html;
+
+    document.getElementById("folderList").innerHTML = html;
 }
 
-function setFolder(f,el){
-    CURRENT_FOLDER=f;
-    document.querySelectorAll(".folder").forEach(x=>x.classList.remove("active-folder"));
+function setFolder(f, el) {
+    CURRENT_FOLDER = f;
+
+    document.querySelectorAll(".folder").forEach(x => x.classList.remove("active-folder"));
     el.classList.add("active-folder");
+
     render();
 }
 
-function setStatus(s,el){
-    CURRENT_STATUS=s;
-    document.querySelectorAll(".card").forEach(x=>x.classList.remove("active-card"));
+function setStatus(s, el) {
+    CURRENT_STATUS = s;
+
+    document.querySelectorAll(".card").forEach(x => x.classList.remove("active-card"));
     el.classList.add("active-card");
+
     render();
 }
 
-function openLog(path){
-    window.open("/open_log?path="+encodeURIComponent(path));
+function openLog(path) {
+    window.open("/open_log?path=" + encodeURIComponent(path), "_blank");
 }
 
-function update(path,val){
-    ANALYSIS[path]=val;
-    fetch("/save_analysis",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ANALYSIS)});
+function update(file, val) {
+    ANALYSIS[file] = val;
+
+    fetch("/save_analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ANALYSIS)
+    });
 }
 
-function render(){
+function updateCharts(allData) {
+    let pass = allData.filter(d => d.status === "PASS").length;
+    let fail = allData.filter(d => d.status === "FAIL").length;
+    let error = allData.filter(d => d.status === "ERROR").length;
+    let halted = allData.filter(d => d.status === "HALTED").length;
 
-    let search=document.getElementById("searchBox").value.toLowerCase();
+    if (statusChart) statusChart.destroy();
+    statusChart = new Chart(document.getElementById("statusChart"), {
+        type: "pie",
+        data: {
+            labels: ["PASS", "FAIL", "ERROR", "HALTED"],
+            datasets: [{
+                data: [pass, fail, error, halted],
+                backgroundColor: ["#22c55e", "#fb923c", "#38bdf8", "#9ca3af"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 
-    let filtered=DATA.filter(d=>
-        (CURRENT_FOLDER==="ALL"||d.module===CURRENT_FOLDER)&&
-        (CURRENT_STATUS==="ALL"||d.status===CURRENT_STATUS)&&
+    let modules = [...new Set(allData.map(d => d.module))];
+    modules.sort((a, b) => a.localeCompare(b));
+    let counts = modules.map(m => allData.filter(d => d.module === m).length);
+
+    if (moduleChart) moduleChart.destroy();
+    moduleChart = new Chart(document.getElementById("moduleChart"), {
+        type: "bar",
+        data: {
+            labels: modules,
+            datasets: [{
+                label: "Logs",
+                data: counts,
+                backgroundColor: "#3b82f6"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+function render() {
+    let search = document.getElementById("searchBox").value.toLowerCase();
+
+    let filtered = DATA.filter(d =>
+        (CURRENT_FOLDER === "ALL" || d.module === CURRENT_FOLDER) &&
+        (CURRENT_STATUS === "ALL" || d.status === CURRENT_STATUS) &&
         d.file.toLowerCase().includes(search)
     );
 
-    filtered.sort((a,b)=>new Date(b.date)-new Date(a.date));
+    let rows = "";
 
-    document.getElementById("totalCount").innerText=DATA.length;
-    document.getElementById("passCount").innerText=DATA.filter(d=>d.status==="PASS").length;
-    document.getElementById("failCount").innerText=DATA.filter(d=>d.status==="FAIL").length;
-    document.getElementById("errorCount").innerText=DATA.filter(d=>d.status==="ERROR").length;
-    document.getElementById("haltedCount").innerText=DATA.filter(d=>d.status==="HALTED").length;
+    filtered.forEach(d => {
+        let note = ANALYSIS[d.file] || "";
 
-    let rows="";
-
-    if(filtered.length===0){
-        rows=`<tr><td colspan="9" style="text-align:center;">No logs found</td></tr>`;
-    }
-
-    filtered.forEach(d=>{
-        let note=ANALYSIS[d.path]||"";
-
-        rows+=`
-        <tr class="${d.status}" onclick="openLog(${JSON.stringify(d.path)})">
+        rows += `
+        <tr onclick="openLog('${d.path}')">
             <td>${d.file}</td>
             <td>${d.module}</td>
-            <td>${d.date}</td>
-            <td>${d.total}</td>
-            <td>${d.passed}</td>
-            <td>${d.failed}</td>
-            <td>${d.errors}</td>
             <td><span class="badge ${d.status}">${d.status}</span></td>
             <td>
                 <input class="analysis"
-                value="${note}"
-                onclick="event.stopPropagation()"
-                oninput="update('${d.path}',this.value)">
+                       value="${note}"
+                       onclick="event.stopPropagation()"
+                       oninput="update('${d.file}', this.value)">
             </td>
         </tr>`;
     });
 
-    document.getElementById("table").innerHTML=rows;
+    document.getElementById("table").innerHTML = rows;
+
+    if (CURRENT_FOLDER === "ALL") {
+        document.getElementById("graphSection").style.display = "grid";
+        updateCharts(DATA);
+    } else {
+        document.getElementById("graphSection").style.display = "none";
+    }
 }
 
-window.onload=()=>{initFolders();render();};
-
+window.onload = () => {
+    initFolders();
+    render();
+};
 </script>
 
 </body>
